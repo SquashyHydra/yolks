@@ -8,13 +8,12 @@ cd /home/container
 # are owned by a different UID/GID.
 if [ "$(id -u)" = "0" ]; then
     chown -R container:container /home/container
-    exec su -s /bin/bash container -c "$*"
 fi
 
 # If no command was supplied, open bash.
-if [ $# -eq 0 ]; then
+if [ -z "$STARTUP" ]; then
     exec /bin/bash
 fi
 
 # Execute the command supplied by Pterodactyl.
-exec "$@"
+exec $STARTUP

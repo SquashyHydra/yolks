@@ -27,4 +27,4 @@ RUN chmod +x /entrypoint.sh \
 
 USER container
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD [ "/bin/bash", "/entrypoint.sh" ]
