@@ -1,13 +1,12 @@
 FROM ubuntu:24.04
 
-ENV MYSQL_APT_CONFIG_VERSION=0.8.36-1
-
 LABEL author="SquashyHydra"
 LABEL org.opencontainers.image.title="Ubuntu 24.04"
 LABEL org.opencontainers.image.description="Ubuntu 24.04 base image for Pterodactyl"
 LABEL org.opencontainers.image.source="https://github.com/SquashyHydra/games"
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV MYSQL_APT_CONFIG_VERSION=0.8.36-1
 ENV TZ=UTC
 
 RUN apt-get update \
