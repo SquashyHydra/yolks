@@ -21,6 +21,7 @@ jobs:
       matrix:
         tag:
           - ubuntu
+          - azerothcore
 
     steps:
       - uses: actions/checkout@v4
