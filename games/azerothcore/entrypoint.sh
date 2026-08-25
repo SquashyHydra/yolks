@@ -4,16 +4,6 @@ set -e
 
 cd /home/container
 
-# If the default config files exist, copy them to the correct location and set ownership to the container user.
-if [ -f "/home/container/env/dist/etc/azerothcore.conf.dist" ]; then
-    cp /home/container/env/dist/etc/azerothcore.conf.dist /home/container/env/dist/etc/azerothcore.conf
-    chown container:container /home/container/env/dist/etc/azerothcore.conf
-fi
-if [ -f "/home/container/env/dist/etc/worldserver.conf.dist" ]; then
-    cp /home/container/env/dist/etc/worldserver.conf.dist /home/container/env/dist/etc/worldserver.conf
-    chown container:container /home/container/env/dist/etc/worldserver.conf
-fi
-
 # Fix permissions in case Pterodactyl mounted files
 # are owned by a different UID/GID.
 #if [ "$(id -u)" = "0" ]; then
