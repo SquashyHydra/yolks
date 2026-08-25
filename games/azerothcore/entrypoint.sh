@@ -4,7 +4,7 @@ set -e
 
 cd /home/container
 
-# If the configuration files don't exist, copy them from the default ones.
+# If the default config files exist, copy them to the correct location and set ownership to the container user.
 if [ -f "/home/container/env/dist/etc/azerothcore.conf.dist" ]; then
     cp /home/container/env/dist/etc/azerothcore.conf.dist /home/container/env/dist/etc/azerothcore.conf
     chown container:container /home/container/env/dist/etc/azerothcore.conf
