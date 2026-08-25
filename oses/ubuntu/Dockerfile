@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/SquashyHydra/games"
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-RUN apt-get update \
+RUN apt-get update -y \
     && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 

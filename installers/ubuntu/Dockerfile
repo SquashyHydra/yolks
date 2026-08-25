@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.licenses=MIT
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
+RUN apt-get update -y \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
