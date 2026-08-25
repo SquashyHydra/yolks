@@ -1,21 +1,23 @@
 FROM        --platform=$TARGETOS/$TARGETARCH ubuntu:24.04
 
 LABEL       author="SquashyHydra"
-LABEL       maintainer="squashyhydra"
+LABEL       maintainer="SquashyHydra"
 
 LABEL       org.opencontainers.image.source="https://github.com/SquashyHydra/yolks"
 LABEL       org.opencontainers.image.licenses=MIT
 
 ENV         DEBIAN_FRONTEND=noninteractive
 
-RUN         dpkg --add-architecture i386 \
-                && apt update \
-                && apt upgrade -y \
-                && apt -y --no-install-recommends install \
+RUN         apt-get update \
+                && apt-get upgrade -y \
+                && apt-get install -y --no-install-recommends \
+                    bash \
                     ca-certificates \
                     curl \
-                    lib32gcc-s1 \
-                    libsdl2-2.0-0:i386 \
                     git \
                     wget \
+                    tar \
+                    gzip \
+                    unzip \
+                    xz-utils \
                 && rm -rf /var/lib/apt/lists/*
