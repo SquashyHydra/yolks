@@ -22,15 +22,26 @@ if [ -f "/home/container/mysql_init.sh" ]; then
         sleep 1
     done
     echo "MySQL is ready."
-
     chmod +x /home/container/mysql_init.sh
     /bin/bash /home/container/mysql_init.sh
-    rm -f /home/container/mysql_init.sh
+    # check if folder /home/container/data/mysql exists
+    if [ -d "/home/container/data/mysql" ]; then
+        for f in /path/to/AzerothCore/data/sql/base/db_auth/*.sql; do mysql -u root acore_auth < "$f"; done
+        for f in /path/to/AzerothCore/data/sql/base/db_characters/*.sql; do mysql -u root acore_characters < "$f"; done
+        for f in /path/to/AzerothCore/data/sql/base/db_world/*.sql; do mysql -u root acore_world < "$f"; done
+        mv /home/container/mysql_init.sh /home/container/data/mysql/mysql_init.sh
+    else
+        rm -f /home/container/mysql_init.sh
+    fi
 
     echo "Stopping MySQL..."
     mysqladmin -u root shutdown
     wait "$MYSQL_PID"
     echo "MySQL stopped."
+fi
+
+if [ -f "/home/container/acore.sh" ]; then
+    chmod +x /home/container/acore.sh
 fi
 
 # If no command was supplied, open bash.
