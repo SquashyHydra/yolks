@@ -25,7 +25,6 @@ RUN apt-get update -y \
         libncurses-dev \
         libboost-all-dev \
         lsb-release \
-        mysql-server \
         libmysqlclient-dev \
         gnupg \
         wget \
