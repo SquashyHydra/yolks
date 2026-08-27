@@ -10,8 +10,10 @@ on:
     paths:
       - games/**
 
+# Runtime Ubuntu container for AMD64 only
+
 jobs:
-  push:
+  pushAMD:
     name: "games:${{ matrix.games }}"
     runs-on: ubuntu-latest
 
