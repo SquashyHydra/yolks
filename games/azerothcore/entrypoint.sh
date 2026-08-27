@@ -193,6 +193,8 @@ EOF
 
 fi
 
+PARSED=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval echo "$(cat -)")
+
 cd /home/container
 
 # If the configuration files do not exist, copy them.
@@ -212,8 +214,8 @@ if [ -f "/home/container/acore.sh" ]; then
     chmod +x /home/container/acore.sh
 fi
 
-if [ -z "$STARTUP" ]; then
+if [ -z "$PARSED" ]; then
     exec /bin/bash
 fi
 
-exec $STARTUP
+exec $PARSED
