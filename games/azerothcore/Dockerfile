@@ -51,14 +51,6 @@ RUN mkdir -p /var/log/mysql \
 
 WORKDIR /home/container
 
-RUN mkdir -p /home/container/mysql \
-    && chown container:container /home/container/mysql \
-    && chmod 600 /home/container/mysql
-
-RUN mkdir -p /home/container/mysql_data \
-    && chown container:container /home/container/mysql_data \
-    && chmod 600 /home/container/mysql_data
-
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \
