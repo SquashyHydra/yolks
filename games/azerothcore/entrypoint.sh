@@ -21,8 +21,6 @@ if [ -f "/home/container/mysql_init.sh" ]; then
     MYSQL_ADMIN_USER=$(< /home/container/database_user.txt)
     MYSQL_ADMIN_PASSWORD=$(< /home/container/database_password.txt)
 
-    rm -f /home/container/*.txt
-
     mysql_dir=$(dirname "$MYSQL_SOCKET")
 
     echo "===== MySQL directory ====="
@@ -171,11 +169,13 @@ EOF
             mysql acore_world < "$f"
         done
 
+        rm -f /home/container/*.txt
         mv \
             /home/container/mysql_init.sh \
             /home/container/data/sql/mysql_init.sh
 
     else
+        rm -f /home/container/*.txt
         rm -f /home/container/mysql_init.sh
     fi
 
