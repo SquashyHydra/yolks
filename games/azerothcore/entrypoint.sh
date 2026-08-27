@@ -32,8 +32,8 @@ if [ -f "/home/container/mysql_init.sh" ]; then
 
     echo "Preparing MySQL..."
 
-    chmod 600 "$MYSQL_DATADIR"
-    chmod 600 "$mysql_dir"
+    chmod 777 "$MYSQL_DATADIR"
+    chmod 777 "$mysql_dir"
 
     if [ -z "$MYSQL_ADMIN_USER" ]; then
         echo "ERROR: MySQL database username is empty."
@@ -52,7 +52,11 @@ if [ -f "/home/container/mysql_init.sh" ]; then
 
         mysqld \
             --initialize-insecure \
-            --datadir="$MYSQL_DATADIR"
+            --datadir="$MYSQL_DATADIR" \
+            --socket="$MYSQL_SOCKET" \
+            --pid-file="$MYSQL_PIDFILE" \
+            --log-error="$MYSQL_LOGFILE" \
+            --console
 
         echo "Creating MySQL bootstrap configuration..."
 
