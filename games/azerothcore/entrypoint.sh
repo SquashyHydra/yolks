@@ -177,10 +177,32 @@ EOF
         mv \
             /home/container/mysql_init.sh \
             /home/container/data/sql/mysql_init.sh
+        touch /home/container/start_mysqld.sh
+        cat > /home/container/start_mysqld.sh <<EOF
+#!/bin/bash
+
+mysqld --datadir="$MYSQL_DATADIR" --socket="$MYSQL_SOCKET" --pid-file="$MYSQL_PIDFILE" --log-error="$MYSQL_LOGFILE" --console &
+while inotifywait -e modify "$MYSQL_LOGFILE"; do 
+    tail -n 1 "$MYSQL_LOGFILE"
+done
+EOF
+
+    chmod +x /home/container/start_mysqld.sh
 
     else
         rm -f /home/container/*.txt
         rm -f /home/container/mysql_init.sh
+        touch /home/container/start_mysqld.sh
+        cat > /home/container/start_mysqld.sh <<EOF
+#!/bin/bash
+
+mysqld --datadir="$MYSQL_DATADIR" --socket="$MYSQL_SOCKET" --pid-file="$MYSQL_PIDFILE" --log-error="$MYSQL_LOGFILE" --console &
+while inotifywait -e modify "$MYSQL_LOGFILE"; do 
+    tail -n 1 "$MYSQL_LOGFILE"
+done
+EOF
+
+    chmod +x /home/container/start_mysqld.sh
     fi
 
     echo "Stopping MySQL..."
@@ -192,8 +214,6 @@ EOF
     echo "MySQL stopped."
 
 fi
-
-PARSED=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval echo "$(cat -)")
 
 cd /home/container
 
@@ -214,8 +234,8 @@ if [ -f "/home/container/acore.sh" ]; then
     chmod +x /home/container/acore.sh
 fi
 
-if [ -z "$PARSED" ]; then
+if [ -z "$STARTUP" ]; then
     exec /bin/bash
 fi
 
-exec $PARSED
+exec $STARTUP
