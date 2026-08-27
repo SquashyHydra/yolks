@@ -181,10 +181,26 @@ EOF
         cat > /home/container/start_mysqld.sh <<EOF
 #!/bin/bash
 
-mysqld --datadir="$MYSQL_DATADIR" --socket="$MYSQL_SOCKET" --pid-file="$MYSQL_PIDFILE" --log-error="$MYSQL_LOGFILE" --console &
-while inotifywait -e modify "$MYSQL_LOGFILE"; do 
-    tail -n 1 "$MYSQL_LOGFILE"
-done
+set -e
+
+mysqld \
+    --datadir="$MYSQL_DATADIR" \
+    --socket="$MYSQL_SOCKET" \
+    --pid-file="$MYSQL_PIDFILE" \
+    --log-error="$MYSQL_LOGFILE" \
+    --console &
+
+MYSQL_PID=\$!
+
+tail -F "$MYSQL_LOGFILE" &
+TAIL_PID=\$!
+
+wait "\$MYSQL_PID"
+MYSQL_EXIT=\$?
+
+kill "\$TAIL_PID" 2>/dev/null || true
+
+exit "\$MYSQL_EXIT"
 EOF
 
     chmod +x /home/container/start_mysqld.sh
