@@ -43,7 +43,7 @@ RUN groupadd --gid 980 container \
 # Prepare MySQL data directory while building the image as root.
 RUN mkdir -p /var/lib/mysql \
     && chown -R container:container /var/lib/mysql \
-    && chown -R container:container /var/log/mysql
+    && chown -R container:container /var/log    /mysql
 
 WORKDIR /home/container
 
