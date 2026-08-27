@@ -30,10 +30,19 @@ RUN apt-get update -y \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd \
-    --create-home \
-    --shell /bin/bash \
-    container
+# Create the Pterodactyl container user with the same UID/GID
+# configured in Wings.
+RUN groupadd --gid 980 container \
+    && useradd \
+        --uid 999 \
+        --gid 980 \
+        --create-home \
+        --shell /bin/bash \
+        container
+
+# Prepare MySQL data directory while building the image as root.
+RUN mkdir -p /var/lib/mysql \
+    && chown -R container:container /var/lib/mysql
 
 WORKDIR /home/container
 
@@ -43,6 +52,6 @@ RUN chmod +x /entrypoint.sh \
     && chown container:container /entrypoint.sh \
     && chown -R container:container /home/container
 
-USER root
+USER container
 
 CMD [ "/bin/bash", "/entrypoint.sh" ]
