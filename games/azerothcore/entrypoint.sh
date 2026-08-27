@@ -14,6 +14,7 @@ if [ -f "/home/container/mysql_init.sh" ]; then
     MYSQL_DATADIR=$(< /home/container/database_dir.txt)
     MYSQL_SOCKET=$(< /home/container/database_socket.txt)
     MYSQL_PIDFILE=$(< /home/container/database_pid.txt)
+    MYSQL_LOGFILE=$(< /home/container/database_log.txt)
     MYSQL_CNF="/home/container/.my.cnf"
     MYSQL_INIT_FILE="$MYSQL_DATADIR/mysql_bootstrap.sql"
 
