@@ -47,6 +47,9 @@ RUN mkdir -p /var/lib/mysql \
 
 WORKDIR /home/container
 
+RUN mkdir -p /home/container/mysql_data \
+    && chown -R 999:980 /home/container/mysql_data
+
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \
