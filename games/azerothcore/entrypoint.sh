@@ -23,14 +23,19 @@ if [ -f "/home/container/mysql_init.sh" ]; then
 
     rm -f /home/container/*.txt
 
+    mysql_dir=$(dirname "$MYSQL_SOCKET")
+
     echo "===== MySQL directory ====="
+    mkdir -p "$MYSQL_DATADIR"
+    mkdir -p "$mysql_dir"
     ls -ld "$MYSQL_DATADIR"
     stat "$MYSQL_DATADIR"
     echo "==========================="
 
     echo "Preparing MySQL..."
 
-    chmod 700 "$MYSQL_DATADIR"
+    chmod 600 "$MYSQL_DATADIR"
+    chmod 600 "$mysql_dir"
 
     if [ -z "$MYSQL_ADMIN_USER" ]; then
         echo "ERROR: MySQL database username is empty."
