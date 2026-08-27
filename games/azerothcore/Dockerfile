@@ -7,7 +7,6 @@ LABEL org.opencontainers.image.source="https://github.com/SquashyHydra/games"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
-ENV MYSQL_APT_CONFIG_VERSION=0.8.36-1
 
 RUN apt-get update -y \
     && apt-get upgrade -y \
