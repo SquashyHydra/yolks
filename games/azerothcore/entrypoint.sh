@@ -99,6 +99,7 @@ EOF
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
             --init-file="$MYSQL_INIT_FILE" \
+            --log-error="$MYSQL_DATADIR/mysql-error.log"
             --console &
 
     else
