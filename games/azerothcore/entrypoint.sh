@@ -4,6 +4,18 @@ set -e
 
 cd /home/container
 
+echo "===== Runtime identity ====="
+id
+whoami
+echo "UID: $(id -u)"
+echo "GID: $(id -g)"
+echo "============================"
+
+echo "===== MySQL directory ====="
+ls -ld /var/lib/mysql
+stat /var/lib/mysql
+echo "==========================="
+
 # If a MySQL initialization script exists, run it.
 if [ -f "/home/container/mysql_init.sh" ]; then
     echo "Preparing MySQL data directory..."
