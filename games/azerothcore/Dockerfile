@@ -43,19 +43,27 @@ RUN groupadd --gid 980 container \
 # Prepare MySQL data directory while building the image as root.
 RUN mkdir -p /var/lib/mysql \
     && chown 999:980 /var/lib/mysql \
-    && chmod 600 /var/lib/mysql
+    && chmod 777 /var/lib/mysql
 
 RUN mkdir -p /var/log/mysql \
     && chown 999:980 /var/log/mysql \
-    && chmod 600 /var/log/mysql
+    && chmod 777 /var/log/mysql
 
 WORKDIR /home/container
+
+RUN mkdir -p /home/container/mysql \
+    && chown 999:980 /home/container/mysql \
+    && chmod 777 /home/container/mysql
+
+RUN mkdir -p /home/container/mysql_data \
+    && chown 999:980 /home/container/mysql_data \
+    && chmod 777 /home/container/mysql_data
 
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \
-    && chown container:container /entrypoint.sh \
-    && chown -R container:container /home/container
+    && chown 999:980 /entrypoint.sh \
+    && chown -R 999:980 /home/container
 
 USER container
 
