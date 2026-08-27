@@ -20,6 +20,8 @@ if [ -f "/home/container/mysql_init.sh" ]; then
     MYSQL_ADMIN_USER=$(< /home/container/database_user.txt)
     MYSQL_ADMIN_PASSWORD=$(< /home/container/database_password.txt)
 
+    rm -f "/home/container/*.txt"
+
     echo "===== MySQL directory ====="
     mkdir -p "$MYSQL_DATADIR"
     ls -ld "$MYSQL_DATADIR"
