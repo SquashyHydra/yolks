@@ -11,9 +11,9 @@ echo "============================"
 # If a MySQL initialization script exists, run it.
 if [ -f "/home/container/mysql_init.sh" ]; then
 
-    MYSQL_DATADIR="/home/container/mysql_data"
-    MYSQL_SOCKET="$MYSQL_DATADIR/mysql.sock"
-    MYSQL_PIDFILE="$MYSQL_DATADIR/mysql.pid"
+    MYSQL_DATADIR=$(< /home/container/database_dir.txt)
+    MYSQL_SOCKET=$(< /home/container/database_socket.txt)
+    MYSQL_PIDFILE=$(< /home/container/database_pid.txt)
     MYSQL_CNF="/home/container/.my.cnf"
     MYSQL_INIT_FILE="$MYSQL_DATADIR/mysql_bootstrap.sql"
 
@@ -139,32 +139,32 @@ EOF
     # Import AzerothCore SQL.
     #
     # Change /path/to/AzerothCore if your SQL files are somewhere else.
-    if [ -d "/home/container/data/mysql" ]; then
+    if [ -d "/home/container/data/sql" ]; then
 
         echo "Importing auth database..."
 
-        for f in /path/to/AzerothCore/data/sql/base/db_auth/*.sql; do
+        for f in /home/container/data/sql/base/db_auth/*.sql; do
             [ -f "$f" ] || continue
             mysql acore_auth < "$f"
         done
 
         echo "Importing characters database..."
 
-        for f in /path/to/AzerothCore/data/sql/base/db_characters/*.sql; do
+        for f in /home/container/data/sql/base/db_characters/*.sql; do
             [ -f "$f" ] || continue
             mysql acore_characters < "$f"
         done
 
         echo "Importing world database..."
 
-        for f in /path/to/AzerothCore/data/sql/base/db_world/*.sql; do
+        for f in /home/container/data/sql/base/db_world/*.sql; do
             [ -f "$f" ] || continue
             mysql acore_world < "$f"
         done
 
         mv \
             /home/container/mysql_init.sh \
-            /home/container/data/mysql/mysql_init.sh
+            /home/container/data/sql/mysql_init.sh
 
     else
         rm -f /home/container/mysql_init.sh
