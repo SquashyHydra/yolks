@@ -55,8 +55,7 @@ if [ -f "/home/container/mysql_init.sh" ]; then
             --datadir="$MYSQL_DATADIR" \
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
-            --log-error="$MYSQL_LOGFILE" \
-            --console
+            --log-error="$MYSQL_LOGFILE"
 
         echo "Creating MySQL bootstrap configuration..."
 
@@ -105,8 +104,7 @@ EOF
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
             --log-error="$MYSQL_LOGFILE" \
-            --init-file="$MYSQL_INIT_FILE" \
-            --console &
+            --init-file="$MYSQL_INIT_FILE" &
 
     else
 
@@ -114,8 +112,7 @@ EOF
             --datadir="$MYSQL_DATADIR" \
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
-            --log-error="$MYSQL_LOGFILE" \
-            --console &
+            --log-error="$MYSQL_LOGFILE" &
 
     fi
 
