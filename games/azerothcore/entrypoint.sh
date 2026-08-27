@@ -4,16 +4,11 @@ set -e
 
 cd /home/container
 
-# If the configuration files do not exist, copy them from the distribution files.
-if [ -f "/home/container/env/dist/etc/authserver.conf.dist" ] && [ ! -f "/home/container/env/dist/etc/authserver.conf" ]; then
-    cp /home/container/env/dist/etc/authserver.conf.dist /home/container/env/dist/etc/authserver.conf
-fi
-if [ -f "/home/container/env/dist/etc/worldserver.conf.dist" ] && [ ! -f "/home/container/env/dist/etc/worldserver.conf" ]; then
-    cp /home/container/env/dist/etc/worldserver.conf.dist /home/container/env/dist/etc/worldserver.conf
-fi
-
 # If a MySQL initialization script exists, run it.
 if [ -f "/home/container/mysql_init.sh" ]; then
+    echo "Preparing MySQL data directory..."
+    mkdir -p /var/lib/mysql
+    chown -R mysql:mysql /var/lib/mysql
     echo "Starting MySQL..."
     mysqld --user=mysql --console &
     MYSQL_PID=$!
@@ -33,21 +28,35 @@ if [ -f "/home/container/mysql_init.sh" ]; then
     else
         rm -f /home/container/mysql_init.sh
     fi
-
     echo "Stopping MySQL..."
     mysqladmin -u root shutdown
     wait "$MYSQL_PID"
     echo "MySQL stopped."
 fi
 
-if [ -f "/home/container/acore.sh" ]; then
-    chmod +x /home/container/acore.sh
-fi
+exec su -s /bin/bash container -c '
+    cd /home/container
 
-# If no command was supplied, open bash.
-if [ -z "$STARTUP" ]; then
-    exec /bin/bash
-fi
+    # If the configuration files do not exist, copy them.
+    if [ -f "/home/container/env/dist/etc/authserver.conf.dist" ] &&
+       [ ! -f "/home/container/env/dist/etc/authserver.conf" ]; then
+        cp /home/container/env/dist/etc/authserver.conf.dist \
+           /home/container/env/dist/etc/authserver.conf
+    fi
 
-# Execute the command supplied by Pterodactyl.
-exec $STARTUP
+    if [ -f "/home/container/env/dist/etc/worldserver.conf.dist" ] &&
+       [ ! -f "/home/container/env/dist/etc/worldserver.conf" ]; then
+        cp /home/container/env/dist/etc/worldserver.conf.dist \
+           /home/container/env/dist/etc/worldserver.conf
+    fi
+
+    if [ -f "/home/container/acore.sh" ]; then
+        chmod +x /home/container/acore.sh
+    fi
+
+    if [ -z "$STARTUP" ]; then
+        exec /bin/bash
+    fi
+
+    exec $STARTUP
+'

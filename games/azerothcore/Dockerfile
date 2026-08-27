@@ -43,6 +43,6 @@ RUN chmod +x /entrypoint.sh \
     && chown container:container /entrypoint.sh \
     && chown -R container:container /home/container
 
-USER container
+USER root
 
 CMD [ "/bin/bash", "/entrypoint.sh" ]
