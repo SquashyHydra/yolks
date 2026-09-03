@@ -123,12 +123,42 @@ EOF
 
     echo "Waiting for MySQL to become ready..."
 
-    until mysqladmin ping --silent 2>/dev/null; do
+    MYSQL_WAIT=0
+    MYSQL_TIMEOUT=120
+
+    while true; do
+
+        if mysqladmin \
+            --socket="$MYSQL_SOCKET" \
+            --user="$MYSQL_ADMIN_USER" \
+            --password="$MYSQL_ADMIN_PASSWORD" \
+            ping --silent 2>/dev/null; then
+
+            echo "MySQL is ready."
+            break
+        fi
 
         if ! kill -0 "$MYSQL_PID" 2>/dev/null; then
             echo "ERROR: MySQL exited unexpectedly."
+            echo "===== MySQL log ====="
+            cat "$MYSQL_LOGFILE" 2>/dev/null || true
+            echo "====================="
             wait "$MYSQL_PID"
             exit 1
+        fi
+
+        MYSQL_WAIT=$((MYSQL_WAIT + 1))
+
+        if [ "$MYSQL_WAIT" -ge "$MYSQL_TIMEOUT" ]; then
+            echo "ERROR: MySQL did not become ready within ${MYSQL_TIMEOUT} seconds."
+            echo "===== MySQL log ====="
+            cat "$MYSQL_LOGFILE" 2>/dev/null || true
+            echo "====================="
+            exit 1
+        fi
+
+        if [ $((MYSQL_WAIT % 5)) -eq 0 ]; then
+            echo "Still waiting for MySQL... ${MYSQL_WAIT}s"
         fi
 
         sleep 1
