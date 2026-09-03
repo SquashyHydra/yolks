@@ -89,9 +89,6 @@ EOF
 
     # Create the MySQL client credentials file.
     cat > "$MYSQL_CNF" <<EOF
-[mysqld]
-bind-address = 0.0.0.0
-
 [client]
 user=$MYSQL_ADMIN_USER
 password=$MYSQL_ADMIN_PASSWORD
@@ -135,16 +132,12 @@ EOF
     while true; do
 
         if mysqladmin \
+            --socket="$MYSQL_SOCKET" \
             --user="$MYSQL_ADMIN_USER" \
             --password="$MYSQL_ADMIN_PASSWORD" \
-            --datadir="$MYSQL_DATADIR" \
-            --socket="$MYSQL_SOCKET" \
-            --pid-file="$MYSQL_PIDFILE" \
-            --log-error="$MYSQL_LOGFILE" \
-            --bind-address=0.0.0.0 \
             ping --silent 2>/dev/null; then
 
-            echo "MySQL is started."
+            echo "MySQL is ready."
             break
         fi
 
