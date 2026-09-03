@@ -106,7 +106,6 @@ EOF
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
             --log-error="$MYSQL_LOGFILE" \
-            --init-file="$MYSQL_INIT_FILE" \
             --bind-address=0.0.0.0 \
             --console &
 
@@ -132,10 +131,9 @@ EOF
     while true; do
 
         if mysqladmin \
-            --socket="$MYSQL_SOCKET" \
-            --user="$MYSQL_ADMIN_USER" \
-            --password="$MYSQL_ADMIN_PASSWORD" \
-            ping --silent 2>/dev/null; then
+            --defaults-extra-file="$MYSQL_CNF" \
+            ping \
+            --silent 2>/dev/null; then
 
             echo "MySQL is ready."
             break
@@ -158,10 +156,6 @@ EOF
             cat "$MYSQL_LOGFILE" 2>/dev/null || true
             echo "====================="
             exit 1
-        fi
-
-        if [ $((MYSQL_WAIT % 5)) -eq 0 ]; then
-            echo "Still waiting for MySQL... ${MYSQL_WAIT}s"
         fi
 
         sleep 1
@@ -189,21 +183,21 @@ EOF
 
         for f in /home/container/data/sql/base/db_auth/*.sql; do
             [ -f "$f" ] || continue
-            mysql acore_auth < "$f"
+            mysql --defaults-extra-file="\$MYSQL_CNF" acore_auth < "$f"
         done
 
         echo "Importing characters database..."
 
         for f in /home/container/data/sql/base/db_characters/*.sql; do
             [ -f "$f" ] || continue
-            mysql acore_characters < "$f"
+            mysql --defaults-extra-file="\$MYSQL_CNF" acore_characters < "$f"
         done
 
         echo "Importing world database..."
 
         for f in /home/container/data/sql/base/db_world/*.sql; do
             [ -f "$f" ] || continue
-            mysql acore_world < "$f"
+            mysql --defaults-extra-file="\$MYSQL_CNF" acore_world < "$f"
         done
 
         rm -f /home/container/*.txt
@@ -274,7 +268,7 @@ EOF
 
     echo "Stopping MySQL..."
 
-    mysqladmin shutdown
+    mysqladmin --defaults-extra-file="$MYSQL_CNF" shutdown
 
     wait "$MYSQL_PID"
 
