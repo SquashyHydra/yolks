@@ -144,7 +144,7 @@ EOF
             --bind-address=0.0.0.0 \
             ping --silent 2>/dev/null; then
 
-            echo "MySQL is ready."
+            echo "MySQL is started."
             break
         fi
 
