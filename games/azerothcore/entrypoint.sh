@@ -123,7 +123,7 @@ EOF
 
     echo "Waiting for MySQL to become ready..."
 
-    until mysqladmin ping --silent 2>/dev/null; do
+    until mysqladmin --socket="$MYSQL_SOCKET" ping --silent 2>/dev/null; do
 
         if ! kill -0 "$MYSQL_PID" 2>/dev/null; then
             echo "ERROR: MySQL exited unexpectedly."
