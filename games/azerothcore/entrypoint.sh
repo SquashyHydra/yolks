@@ -56,7 +56,6 @@ if [ -f "/home/container/mysql_init.sh" ]; then
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
             --log-error="$MYSQL_LOGFILE" \
-            --bind-address=0.0.0.0 \
             --console
 
         echo "Creating MySQL bootstrap configuration..."
@@ -65,27 +64,11 @@ if [ -f "/home/container/mysql_init.sh" ]; then
 CREATE USER IF NOT EXISTS '$MYSQL_ADMIN_USER'@'localhost'
     IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
 
-CREATE USER IF NOT EXISTS '$MYSQL_ADMIN_USER'@'127.0.0.1'
-    IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
-
 CREATE USER IF NOT EXISTS '$MYSQL_ADMIN_USER'@'%'
-    IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
-
-ALTER USER '$MYSQL_ADMIN_USER'@'localhost'
-    IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
-
-ALTER USER '$MYSQL_ADMIN_USER'@'127.0.0.1'
-    IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
-
-ALTER USER '$MYSQL_ADMIN_USER'@'%'
     IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
 
 GRANT ALL PRIVILEGES ON *.*
     TO '$MYSQL_ADMIN_USER'@'localhost'
-    WITH GRANT OPTION;
-
-GRANT ALL PRIVILEGES ON *.*
-    TO '$MYSQL_ADMIN_USER'@'127.0.0.1'
     WITH GRANT OPTION;
 
 GRANT ALL PRIVILEGES ON *.*
@@ -122,7 +105,7 @@ EOF
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
             --log-error="$MYSQL_LOGFILE" \
-            --bind-address=0.0.0.0 \
+            --init-file="$MYSQL_INIT_FILE" \
             --console &
 
     else
@@ -132,7 +115,6 @@ EOF
             --socket="$MYSQL_SOCKET" \
             --pid-file="$MYSQL_PIDFILE" \
             --log-error="$MYSQL_LOGFILE" \
-            --bind-address=0.0.0.0 \
             --console &
 
     fi
@@ -141,36 +123,11 @@ EOF
 
     echo "Waiting for MySQL to become ready..."
 
-    MYSQL_WAIT=0
-    MYSQL_TIMEOUT=120
-
-    while true; do
-
-        if mysqladmin \
-            --defaults-extra-file="$MYSQL_CNF" \
-            ping \
-            --silent 2>/dev/null; then
-
-            echo "MySQL is ready."
-            break
-        fi
+    until mysqladmin ping --silent 2>/dev/null; do
 
         if ! kill -0 "$MYSQL_PID" 2>/dev/null; then
             echo "ERROR: MySQL exited unexpectedly."
-            echo "===== MySQL log ====="
-            cat "$MYSQL_LOGFILE" 2>/dev/null || true
-            echo "====================="
             wait "$MYSQL_PID"
-            exit 1
-        fi
-
-        MYSQL_WAIT=$((MYSQL_WAIT + 1))
-
-        if [ "$MYSQL_WAIT" -ge "$MYSQL_TIMEOUT" ]; then
-            echo "ERROR: MySQL did not become ready within ${MYSQL_TIMEOUT} seconds."
-            echo "===== MySQL log ====="
-            cat "$MYSQL_LOGFILE" 2>/dev/null || true
-            echo "====================="
             exit 1
         fi
 
@@ -199,21 +156,21 @@ EOF
 
         for f in /home/container/data/sql/base/db_auth/*.sql; do
             [ -f "$f" ] || continue
-            mysql --defaults-extra-file="\$MYSQL_CNF" acore_auth < "$f"
+            mysql acore_auth < "$f"
         done
 
         echo "Importing characters database..."
 
         for f in /home/container/data/sql/base/db_characters/*.sql; do
             [ -f "$f" ] || continue
-            mysql --defaults-extra-file="\$MYSQL_CNF" acore_characters < "$f"
+            mysql acore_characters < "$f"
         done
 
         echo "Importing world database..."
 
         for f in /home/container/data/sql/base/db_world/*.sql; do
             [ -f "$f" ] || continue
-            mysql --defaults-extra-file="\$MYSQL_CNF" acore_world < "$f"
+            mysql acore_world < "$f"
         done
 
         rm -f /home/container/*.txt
@@ -231,7 +188,6 @@ mysqld \
     --socket="$MYSQL_SOCKET" \
     --pid-file="$MYSQL_PIDFILE" \
     --log-error="$MYSQL_LOGFILE" \
-    --bind-address=0.0.0.0 \
     --console &
 
 MYSQL_PID=\$!
@@ -256,27 +212,10 @@ EOF
         cat > /home/container/start_mysqld.sh <<EOF
 #!/bin/bash
 
-set -e
-
-mysqld \
-    --datadir="$MYSQL_DATADIR" \
-    --socket="$MYSQL_SOCKET" \
-    --pid-file="$MYSQL_PIDFILE" \
-    --log-error="$MYSQL_LOGFILE" \
-    --bind-address=0.0.0.0 \
-    --console &
-
-MYSQL_PID=\$!
-
-tail -F "$MYSQL_LOGFILE" &
-TAIL_PID=\$!
-
-wait "\$MYSQL_PID"
-MYSQL_EXIT=\$?
-
-kill "\$TAIL_PID" 2>/dev/null || true
-
-exit "\$MYSQL_EXIT"
+mysqld --datadir="$MYSQL_DATADIR" --socket="$MYSQL_SOCKET" --pid-file="$MYSQL_PIDFILE" --log-error="$MYSQL_LOGFILE" --console &
+while inotifywait -e modify "$MYSQL_LOGFILE"; do 
+    tail -n 1 "$MYSQL_LOGFILE"
+done
 EOF
 
     chmod +x /home/container/start_mysqld.sh
@@ -284,11 +223,12 @@ EOF
 
     echo "Stopping MySQL..."
 
-    mysqladmin --defaults-extra-file="$MYSQL_CNF" shutdown
+    mysqladmin shutdown
 
     wait "$MYSQL_PID"
 
     echo "MySQL stopped."
+
 fi
 
 cd /home/container
