@@ -98,26 +98,19 @@ EOF
 
     echo "Starting MySQL..."
 
+    MYSQL_ARGS=(
+        --datadir="$MYSQL_DATADIR"
+        --socket="$MYSQL_SOCKET"
+        --pid-file="$MYSQL_PIDFILE"
+        --log-error="$MYSQL_LOGFILE"
+        --console
+    )
+
     if [ "$FIRST_START" = "true" ]; then
-
-        mysqld \
-            --datadir="$MYSQL_DATADIR" \
-            --socket="$MYSQL_SOCKET" \
-            --pid-file="$MYSQL_PIDFILE" \
-            --log-error="$MYSQL_LOGFILE" \
-            --init-file="$MYSQL_INIT_FILE" \
-            --console &
-
-    else
-
-        mysqld \
-            --datadir="$MYSQL_DATADIR" \
-            --socket="$MYSQL_SOCKET" \
-            --pid-file="$MYSQL_PIDFILE" \
-            --log-error="$MYSQL_LOGFILE" \
-            --console &
-
+        MYSQL_ARGS+=(--init-file="$MYSQL_INIT_FILE")
     fi
+
+    mysqld "${MYSQL_ARGS[@]}" &
 
     MYSQL_PID=$!
 
