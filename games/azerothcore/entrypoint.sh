@@ -62,14 +62,14 @@ if [ -f "/home/container/mysql_init.sh" ]; then
         echo "Creating MySQL bootstrap configuration..."
 
         cat > "$MYSQL_INIT_FILE" <<EOF
-CREATE USER IF NOT EXISTS '$MYSQL_ADMIN_USER'@'localhost'
+CREATE USER IF NOT EXISTS '$MYSQL_ADMIN_USER'@'%'
     IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
 
 CREATE USER IF NOT EXISTS '$MYSQL_ADMIN_USER'@'%'
     IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
 
 GRANT ALL PRIVILEGES ON *.*
-    TO '$MYSQL_ADMIN_USER'@'localhost'
+    TO '$MYSQL_ADMIN_USER'@'%'
     WITH GRANT OPTION;
 
 GRANT ALL PRIVILEGES ON *.*
